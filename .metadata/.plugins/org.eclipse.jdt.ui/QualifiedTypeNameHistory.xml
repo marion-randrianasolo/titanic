@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="org.apache.spark.sql.SparkSession"/>
+    <fullyQualifiedTypeName name="org.apache.spark.sql.Dataset"/>
+    <fullyQualifiedTypeName name="org.apache.arrow.vector.table.Row"/>
+    <fullyQualifiedTypeName name="org.apache.spark.sql.Row"/>
+</qualifiedTypeNameHistroy>
