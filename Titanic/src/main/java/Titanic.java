@@ -1,5 +1,8 @@
 import java.util.Arrays;
 
+import org.apache.spark.ml.classification.RandomForestClassificationModel;
+import org.apache.spark.ml.classification.RandomForestClassifier;
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator;
 import org.apache.spark.ml.feature.StringIndexer;
 import org.apache.spark.ml.feature.StringIndexerModel;
 import org.apache.spark.ml.feature.VectorAssembler;
@@ -107,6 +110,57 @@ public class Titanic {
 		
 		// Display the transformed data
 		transformedData.show();
+		
+		// Modeling
+		// Create two sets : one for training and one for testing
+		Dataset<Row>[] split = transformedData.randomSplit(new double[] {0.8,0.2});
+		Dataset<Row> trainingData = split[0];
+		Dataset<Row> testData = split[1];
+		
+		trainingData.describe().show();
+		testData.describe().show();
+		
+		// Using Random Forest Classifier
+		
+		// Initialize the RandomForestClassifier
+		RandomForestClassifier rf = new RandomForestClassifier()
+				.setLabelCol("Survived")
+				.setFeaturesCol("features")
+				.setMaxMemoryInMB(5);
+		
+		// Create the model
+		RandomForestClassificationModel rfModel = rf.fit(trainingData);
+		
+		// Display the parameters of the model
+		System.out.println("Random Forest Model Parameters:\n" + rfModel.explainParams());
+		
+		// This will give us something called a transformer
+		// And finally, we predict using the test dataset :
+		Dataset<Row> predictions = rfModel.transform(testData);
+		
+		predictions.show();
+		
+		// Evaluate our model 
+		MulticlassClassificationEvaluator evaluator = new MulticlassClassificationEvaluator()
+				.setLabelCol("Survived")
+				.setPredictionCol("prediction")
+				.setMetricName("accuracy");
+		
+		// Display the parameters of the evaluator
+		System.out.println("Evaluator Parameters:\n" + evaluator.explainParams());
+
+		// And to get the accuracy we do : 
+		double accuracy = evaluator.evaluate(predictions);
+		System.out.println("Test Accuracy = "+accuracy); // -> 0.819
+		
+		try {
+			Thread.sleep(86400000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		sparkSession.stop();
+		
 		
 	}
 
